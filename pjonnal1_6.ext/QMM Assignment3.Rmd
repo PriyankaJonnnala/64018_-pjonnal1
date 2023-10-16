@@ -1,0 +1,95 @@
+---
+title: "Assignment 3"
+author: "Priyanka Jonnala"
+date: "2023-10-15"
+output:
+  html_document: default
+  pdf_document: default
+---
+Let W,H be the variables of products for plant A and plant B
+
+W1 = products from plant A to warehouse1
+
+W2 = products from plant A to warehouse2
+
+W3 = products from plant A to warehouse3
+
+H1 = products from plant B to warehouse1
+
+H2 = products from plant B to warehouse2
+
+H3 = products from plant B to warehouse3
+
+Since, the supply and demand are not equal we will use dummy to equalize both of them.
+
+W4 = products from plantA to dummy
+
+H4 = products from plantB to dummy
+
+The objective function is:
+
+Z = (600+22)W1+(625+16)H1+(600+14)W2+(625+20)H2+(600+30)W3+(625+24)H3+(0)W4+(0)H4
+
+Z = (622)W1+(641)H1+(614)W2+(645)H2+(630)W3+(649)H3+(0)W4+(0)H4
+
+Supply Constraints:
+
+W1+W2+W3+W4 = 100
+
+H1+H2+H3+H3 = 120
+
+Demand Constraints:
+
+a1+a2 = 80
+
+b1+b2 = 60
+
+c1+c2 = 70
+
+Non-negative Constraints:
+
+W1,W2,W3,H1,H2,H3 >= 0
+
+Installing the packages
+```{r}
+library(lpSolve)
+library(lpSolveAPI)
+```
+```{r}
+#Objective function matrix
+objfn <- matrix(c(622,614,630,0,
+                  641,645,649,0),nrow = 2, byrow = TRUE)
+#Giving the names for rows and columns
+rownames(objfn) <- c("Plant A","Plant B")
+colnames(objfn) <- c("Warehouse 1", "Warehouse 2", "Warehouse 3", "Dummy")
+objfn
+```
+
+```{r}
+#Giving signs for the rows and columns
+row.dir <- rep("=", 2)
+col.dir <- rep("=", 4)
+```
+
+```{r}
+#Rhs coefficients
+row.rhs <- c(100,120)
+col.rhs <- c(80,60,70,10)
+```
+
+```{r}
+#Solving using lp.transport function
+lpsolve <- lp.transport(objfn,"min",row.dir,row.rhs,col.dir,col.rhs)
+lpsolve
+```
+
+```{r}
+#Decision variable values
+lpsolve$solution
+```
+
+# Results
+Out of 100 units Plant A ships 0 units to Warehouse 1, 60 units to Warehouse 2, and 40 units to Warehouse 3.
+
+Out of 120 units Plant B ships 80 units to Warehouse 1, 0 units to Warehouse 2, 30 units to Warehouse 3 and 10 units to the dummy.
+ 
